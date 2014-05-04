@@ -4,6 +4,7 @@ import (
     "os"
 //    "path/filepath"
     "github.com/codegangsta/cli"
+    "github.com/anarcher/linen"
 )
 
 func main() {
@@ -12,11 +13,9 @@ func main() {
     app.Usage = "A Simple Static Site Generator in Go"
     app.Version = "0.0.1"
 
-    currentDir := "."
-
     app.Flags = []cli.Flag {
-        cli.StringFlag{"config, c", currentDir+"/linen.yaml", "config file (default is current path/linen.yaml|json|toml)"},
-        cli.StringFlag{"root, r", currentDir, "root path (default is current path"},
+        cli.StringFlag{"config, c", "./linen.yaml", "config file (default is current path/linen.yaml|json|toml)"},
+        cli.StringFlag{"root, r", ".", "root path (default is current path"},
     }
 
     app.Commands = []cli.Command{
@@ -25,7 +24,12 @@ func main() {
             ShortName: "b",
             Usage: "Build source files for render",
             Action: func(c *cli.Context) {
-                println(c.GlobalString("config"))
+                config,err := linen.NewConfig(c.GlobalString("config"))
+                if err != nil {
+                    println("Failed to read config file:",err)
+                    return
+                }
+                //println(c.GlobalString("config"))
             },
             Flags: []cli.Flag {
                 cli.StringFlag{"text","plain","text format"},
