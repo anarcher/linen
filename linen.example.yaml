@@ -1,0 +1,5 @@
+sourcedir: ./
+destdir: ./public
+basedir: http://example.com
+params:
+    subtitle: Hello World
