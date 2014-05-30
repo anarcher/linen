@@ -6,9 +6,10 @@ import (
 )
 
 type Site struct {
+    config Config
 }
 
 func NewSite(config Config) (Site, error) {
-	site := Site{}
+    site := Site{config: config}
 	return site, nil
 }
