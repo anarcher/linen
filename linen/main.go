@@ -29,6 +29,7 @@ func main() {
                     println("Failed to read config file:",err)
                     return
                 }
+                println(config.ConfigFile)
                 //println(c.GlobalString("config"))
             },
             Flags: []cli.Flag {

@@ -12,4 +12,9 @@ func TestNewSite(t *testing.T) {
     if err != nil {
         t.Error(site,err)
     }
+
+    err = site.LoadPages()
+    if err != nil {
+        t.Error(err)
+    }
 }
