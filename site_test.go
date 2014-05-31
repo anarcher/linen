@@ -3,7 +3,7 @@ package linen
 import "testing"
 
 func TestNewSite(t *testing.T) {
-    config,err := NewConfig("./linen.example.yaml")
+    config,err := NewConfig("./test/linen.example.yaml")
     if err != nil {
         t.Error(err)
     }
