@@ -1,0 +1,19 @@
+{
+	"ImportPath": "github.com/anarcher/linen",
+	"GoVersion": "go1.4",
+	"Deps": [
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.1.0-9-g3883ac1",
+			"Rev": "3883ac1ce943878302255f538fce319d23226223"
+		},
+		{
+			"ImportPath": "github.com/stretchr/powerwalk",
+			"Rev": "9d928545caa053d78b0bab409cb18b85c700d2c4"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v1",
+			"Rev": "9f9df34309c04878acc86042b16630b0f696e1de"
+		}
+	]
+}
