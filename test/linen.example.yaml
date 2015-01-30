@@ -1,5 +1,0 @@
-sourcedir: ./test
-destdir: ./test/public
-basedir: http://example.com
-params:
-    subtitle: Hello World
