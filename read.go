@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	//	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func Read(srcs Sources, path string) (err error) {
@@ -42,12 +45,36 @@ func ReadOne(src Source, path string) (err error) {
 		}
 
 		src["content"] = c
+		err = readHeaderAndBody(src)
 
+	case ".tmpl":
+		src["type"] = SourceTypeTemplate
 	default:
 		src["type"] = SourceTypeCopy
-
 	}
 
 	return
 
+}
+
+func readHeaderAndBody(src Source) (err error) {
+	c := string(src["content"].([]byte))
+	if len(c) <= 0 {
+		return
+	}
+
+	cs := strings.SplitN(c, "\n---\n", 2)
+
+	if len(cs) == 2 {
+		var data map[string]interface{}
+		err = json.Unmarshal([]byte(cs[0]), &data)
+		if err != nil {
+			return
+		}
+		src["header"] = data
+		src["body"] = cs[1]
+	} else {
+		src["body"] = c
+	}
+	return
 }
