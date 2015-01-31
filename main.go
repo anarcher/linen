@@ -7,7 +7,7 @@ import (
 )
 
 var srcPath = flag.String("src", ".", "source path (default: .)")
-var destPath = flag.String("dest", "./dest", "dest. path (default: ./dest)")
+var targetPath = flag.String("target", "./target", "target path (default: ./target)")
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())

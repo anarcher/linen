@@ -22,7 +22,7 @@ func NewSources(srcPath string) (Sources, error) {
 			return err
 		}
 
-		if isFile(path) == false {
+		if info.IsDir() == true {
 			return nil
 		}
 
@@ -36,20 +36,4 @@ func NewSources(srcPath string) (Sources, error) {
 	})
 
 	return srcs, nil
-}
-
-func isFile(path string) (isFile bool) {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		isFile = false
-		return
-	}
-
-	if fileInfo.IsDir() {
-		isFile = false
-	} else {
-		isFile = true
-	}
-	return
-
 }
