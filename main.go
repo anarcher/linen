@@ -14,9 +14,17 @@ func main() {
 
 	flag.Parse()
 
-	sources, err := NewSources(*srcPath)
+	var err error
+
+	sources := Sources{}
+
+	err = Read(sources, *srcPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
-	log.Print(sources)
+
+	//Transform(sources)
+	//Write(sources)
+
 }

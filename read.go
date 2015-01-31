@@ -2,39 +2,52 @@ package main
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
-func ReadSource(path string) (source Source, err error) {
-	source.Path = path
-	source.Ext = filepath.Ext(path)
+func Read(srcs Sources, path string) (err error) {
 
-	switch source.Ext {
+	filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		src := Source{}
+		err = ReadOne(src, path)
+		srcs[Path(path)] = src
+
+		return err
+	})
+
+	return
+}
+
+func ReadOne(src Source, path string) (err error) {
+
+	fileExt := filepath.Ext(path)
+	src["ext"] = fileExt
+
+	switch fileExt {
 	case ".md":
-		source.Type = SourceTypeMarkdown
-		err = ReadSourceContent(&source)
-	case ".template":
-		source.Type = SourceTypeTemplate
-		err = ReadSourceContent(&source)
+		src["type"] = SourceTypeMarkdown
+
+		var c []byte
+		c, err = ioutil.ReadFile(path)
+		if err != nil {
+			return
+		}
+
+		src["content"] = c
+
 	default:
-		source.Type = SourceTypeCopy
+		src["type"] = SourceTypeCopy
+
 	}
 
 	return
-}
 
-func ReadSourceContent(src *Source) (err error) {
-	var content []byte
-	content, err = ioutil.ReadFile(src.Path)
-	if err != nil {
-		return
-	}
-
-	src.Content = string(content)
-	return
-
-}
-
-func ReadSourceHeader(source *Source) (err error) {
-	return nil
 }
