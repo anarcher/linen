@@ -6,9 +6,21 @@ import (
 	"path/filepath"
 )
 
+const (
+	SourceTypeMarkdown SourceType = iota
+	SourceTypeTemplate
+	SourceTypeCopy
+)
+
+type SourceType int
+
 type Source struct {
-	path    string
-	content string
+	Type    SourceType
+	Header  map[string]interface{}
+	Path    string
+	Content string
+	Body    string
+	Ext     string
 }
 
 type Sources []Source
