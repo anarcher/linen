@@ -24,7 +24,11 @@ func main() {
 		return
 	}
 
-	//Transform(sources)
+	err = Transform(sources)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	//Write(sources)
 
 }

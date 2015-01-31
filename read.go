@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	//	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,7 +10,7 @@ import (
 
 func Read(srcs Sources, path string) (err error) {
 
-	filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -21,9 +20,11 @@ func Read(srcs Sources, path string) (err error) {
 
 		src := Source{}
 		err = ReadOne(src, path)
+		if err != nil {
+			return err
+		}
 		srcs[Path(path)] = src
-
-		return err
+		return nil
 	})
 
 	return
