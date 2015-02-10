@@ -1,5 +1,9 @@
 package main
 
+import (
+	"path/filepath"
+)
+
 const (
 	FileTypeMarkdown = iota
 	FileTypeTemplate
@@ -17,17 +21,20 @@ type File struct {
 
 type Files []*File
 
-
-func NewFile(path ext string) (*File) {
-    file = &File{  Path: path , Ext: ext }
-    var fileType int
-    switch ext {
-    case ".md":
-        fileType = FileTypeMarkdown
-    case ".tmpl":
-        fileType = FileTypeTemplate
-    default:
-        fileType = FileTypePlain
-    }
-    return file
+func NewFile(path string) *File {
+	ext := filepath.Ext(path)
+	file := &File{Path: path, Ext: ext}
+	var fileType int
+	switch ext {
+	case ".md":
+		fileType = FileTypeMarkdown
+		file.Content = make(map[string]interface{})
+	case ".tmpl":
+		fileType = FileTypeTemplate
+		file.Content = make(map[string]interface{})
+	default:
+		fileType = FileTypePlain
+	}
+	file.Type = fileType
+	return file
 }

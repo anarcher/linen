@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	//	"log"
 	"runtime"
 )
 
@@ -14,21 +14,23 @@ func main() {
 
 	flag.Parse()
 
-	var err error
+	//var err error
 
-	sources := Sources{}
+	//sources := Sources{}
 
-	err = Read(sources, *srcPath)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	/*
+		err = Read(sources, *srcPath)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 
-	err = Transform(sources)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+		err = Transform(sources)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	*/
 	//Write(sources)
 
 }

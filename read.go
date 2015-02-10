@@ -1,72 +1,61 @@
 package main
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func Read(files Files, path string) (err error) {
-
-	//func Read(srcs Sources, path string) (err error) {
+func ReadFiles(path string) (files Files, err error) {
 
 	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
 		if info.IsDir() {
-			return nil
-		}
-
-		file := File{
-			Path: path,
-			Ext:  filepath.Ext(path),
-		}
-
-		src := Source{}
-		err = ReadOne(src, path)
-		if err != nil {
 			return err
 		}
-		srcs[Path(path)] = src
+
+		file := NewFile(path)
+		ReadFileContent(file)
+		files = append(files, file)
 		return nil
 	})
 
 	return
 }
 
-func ReadOne(src Source, path string) (err error) {
-
-	fileExt := filepath.Ext(path)
-	src["ext"] = fileExt
-
-	switch fileExt {
-	case ".md":
-		src["type"] = SourceTypeMarkdown
-
+func ReadFileContent(file *File) (err error) {
+	if file.Type == FileTypeMarkdown {
 		var c []byte
-		c, err = ioutil.ReadFile(path)
+		c, err = ioutil.ReadFile(file.Path)
 		if err != nil {
-			return
+			return err
 		}
+		header, body, _err := ReadHeaderAndBody(c)
+		if _err != nil {
+			return _err
+		}
+		file.Content["header"] = header
+		file.Content["body"] = body
 
-		src["content"] = c
-		err = readHeaderAndBody(src)
-
-	case ".tmpl":
-		src["type"] = SourceTypeTemplate
-	default:
-		src["type"] = SourceTypeCopy
+	} else if file.Type == FileTypeTemplate {
+		var c []byte
+		c, err = ioutil.ReadFile(file.Path)
+		if err != nil {
+			return err
+		}
+		file.Content["body"] = string(c)
 	}
 
-	return
-
+	return nil
 }
 
-func readHeaderAndBody(src Source) (err error) {
-	c := string(src["content"].([]byte))
+func ReadHeaderAndBody(content []byte) (header, body string, err error) {
+
+	c := string(content)
 	if len(c) <= 0 {
 		return
 	}
@@ -74,15 +63,11 @@ func readHeaderAndBody(src Source) (err error) {
 	cs := strings.SplitN(c, "\n---\n", 2)
 
 	if len(cs) == 2 {
-		var data map[string]interface{}
-		err = json.Unmarshal([]byte(cs[0]), &data)
-		if err != nil {
-			return
-		}
-		src["header"] = data
-		src["body"] = cs[1]
+		header = cs[0]
+		body = cs[1]
 	} else {
-		src["body"] = c
+		body = c
 	}
+
 	return
 }

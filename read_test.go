@@ -1,37 +1,23 @@
 package main
 
 import (
-	"github.com/kr/pretty"
 	"testing"
+
+	"github.com/kr/pretty"
 )
 
-func TestReadSourcesAll(t *testing.T) {
-	var err error
+func TestReadFiles(t *testing.T) {
 
-	srcs := Sources{}
 	path := "./examples/basic"
-	err = Read(srcs, path)
-
+	files, err := ReadFiles(path)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if len(srcs) != 2 {
-		t.Error("srcs size is not corrent")
+	if len(files) <= 0 {
+		t.Error("files len must be > 0")
 	}
 
-	t.Logf("%# v", pretty.Formatter(srcs))
-}
-
-func TestreadHeaderAndBody(t *testing.T) {
-	var err error
-
-	path := "./examples/basic/post1.md"
-	src := Source{}
-	err = ReadOne(src, path)
-
-	if err != nil {
-		t.Error(err)
-	}
+	t.Logf("%# v", pretty.Formatter(files))
 
 }
