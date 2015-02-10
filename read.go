@@ -8,7 +8,9 @@ import (
 	"strings"
 )
 
-func Read(srcs Sources, path string) (err error) {
+func Read(files Files, path string) (err error) {
+
+	//func Read(srcs Sources, path string) (err error) {
 
 	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -16,6 +18,11 @@ func Read(srcs Sources, path string) (err error) {
 		}
 		if info.IsDir() {
 			return nil
+		}
+
+		file := File{
+			Path: path,
+			Ext:  filepath.Ext(path),
 		}
 
 		src := Source{}
