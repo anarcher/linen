@@ -10,6 +10,11 @@ const (
 	FileTypePlain
 )
 
+const (
+	FileContentHeader = "header"
+	FileContentBody   = "body"
+)
+
 type FileContent map[string]interface{}
 
 type File struct {

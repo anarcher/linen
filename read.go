@@ -38,8 +38,8 @@ func ReadFileContent(file *File) (err error) {
 		if _err != nil {
 			return _err
 		}
-		file.Content["header"] = header
-		file.Content["body"] = body
+		file.Content[FileContentHeader] = header
+		file.Content[FileContentBody] = body
 
 	} else if file.Type == FileTypeTemplate {
 		var c []byte
@@ -47,13 +47,13 @@ func ReadFileContent(file *File) (err error) {
 		if err != nil {
 			return err
 		}
-		file.Content["body"] = string(c)
+		file.Content[FileContentBody] = c
 	}
 
 	return nil
 }
 
-func ReadHeaderAndBody(content []byte) (header, body string, err error) {
+func ReadHeaderAndBody(content []byte) (header, body []byte, err error) {
 
 	c := string(content)
 	if len(c) <= 0 {
@@ -63,10 +63,10 @@ func ReadHeaderAndBody(content []byte) (header, body string, err error) {
 	cs := strings.SplitN(c, "\n---\n", 2)
 
 	if len(cs) == 2 {
-		header = cs[0]
-		body = cs[1]
+		header = []byte(cs[0])
+		body = []byte(cs[1])
 	} else {
-		body = c
+		body = content
 	}
 
 	return
