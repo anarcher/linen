@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -21,11 +21,11 @@ func WriteFiles(files Files, path string) (err error) {
 }
 
 func WriteFile(file *File, path string) (err error) {
-	destPath := path + file.Path
-	fmt.Println("destPath:" + destPath)
-	os.MkdirAll(destPath, DirPerm)
+	dirPath := path + "/" + filepath.Dir(file.Path)
+	fullPath := path + "/" + file.Path
+	os.MkdirAll(dirPath, DirPerm)
 
-	err = ioutil.WriteFile(destPath, file.Content, file.Info.Mode())
+	err = ioutil.WriteFile(fullPath, file.Content, file.Info.Mode())
 
 	return
 }
