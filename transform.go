@@ -9,18 +9,17 @@ func TransformFiles(files Files) (err error) {
 	for _, file := range files {
 
 		//Header
-		if header, ok := file.Content[FileContentHeader]; ok {
+		if header, ok := file.Meta[FileHeaderRaw]; ok {
 			var v map[string]interface{}
 			if err = json.Unmarshal(header.([]byte), &v); err != nil {
 				return err
 			}
-			file.Content[FileContentHeader] = v
+			file.Meta = v
 		}
 
 		//Body
-		if body, ok := file.Content[FileContentBody]; ok {
-			html := blackfriday.MarkdownBasic(body.([]byte))
-			file.Content[FileContentBody] = html
+		if file.Type == FileTypeMarkdown {
+			file.Content = blackfriday.MarkdownBasic(file.Content)
 		}
 
 		if file.Type == FileTypeMarkdown || file.Type == FileTypeTemplate {

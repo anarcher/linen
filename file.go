@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 )
 
@@ -11,32 +12,31 @@ const (
 )
 
 const (
-	FileContentHeader = "header"
-	FileContentBody   = "body"
+	FileHeaderRaw = "_header_"
 )
 
-type FileContent map[string]interface{}
+type FileMeta map[string]interface{}
 
 type File struct {
 	Path    string
 	Ext     string
 	Type    int
-	Content FileContent
+	Meta    FileMeta
+	Info    os.FileInfo
+	Content []byte
 }
 
 type Files []*File
 
-func NewFile(path string) *File {
+func NewFile(path string, info os.FileInfo) *File {
 	ext := filepath.Ext(path)
-	file := &File{Path: path, Ext: ext}
+	file := &File{Path: path, Ext: ext, Info: info, Meta: make(map[string]interface{})}
 	var fileType int
 	switch ext {
 	case ".md":
 		fileType = FileTypeMarkdown
-		file.Content = make(map[string]interface{})
 	case ".tmpl":
 		fileType = FileTypeTemplate
-		file.Content = make(map[string]interface{})
 	default:
 		fileType = FileTypePlain
 	}

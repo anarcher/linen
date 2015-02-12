@@ -18,7 +18,7 @@ func ReadFiles(path string) (files Files, err error) {
 			return err
 		}
 
-		file := NewFile(path)
+		file := NewFile(path, info)
 		ReadFileContent(file)
 		files = append(files, file)
 		return nil
@@ -38,16 +38,16 @@ func ReadFileContent(file *File) (err error) {
 		if _err != nil {
 			return _err
 		}
-		file.Content[FileContentHeader] = header
-		file.Content[FileContentBody] = body
+		file.Meta[FileHeaderRaw] = header
+		file.Content = body
 
-	} else if file.Type == FileTypeTemplate {
+	} else {
 		var c []byte
 		c, err = ioutil.ReadFile(file.Path)
 		if err != nil {
 			return err
 		}
-		file.Content[FileContentBody] = c
+		file.Content = c
 	}
 
 	return nil
