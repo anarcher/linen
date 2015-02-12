@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -22,9 +23,14 @@ func WriteFiles(files Files, path string) (err error) {
 
 func WriteFile(file *File, path string) (err error) {
 	dirPath := path + "/" + filepath.Dir(file.Path)
-	fullPath := path + "/" + file.Path
 	os.MkdirAll(dirPath, DirPerm)
 
+	fullPath := filepath.Join(path, "/")
+	if file.Type == FileTypeTemplate || file.Type == FileTypeMarkdown {
+		fullPath = filepath.Join(fullPath, filepath.Dir(file.Path), "/", strings.Replace(filepath.Base(file.Path), file.Ext, ".html", 1))
+	} else {
+		fullPath = filepath.Join(fullPath, file.Path)
+	}
 	err = ioutil.WriteFile(fullPath, file.Content, file.Info.Mode())
 
 	return
