@@ -8,6 +8,7 @@ import (
 const (
 	FileTypeMarkdown = iota
 	FileTypeTemplate
+	FileTypeJSON
 	FileTypePlain
 )
 

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/russross/blackfriday"
+	"html/template"
 )
 
 func TransformFiles(files Files) (err error) {
@@ -23,8 +25,20 @@ func TransformFiles(files Files) (err error) {
 		}
 
 		if file.Type == FileTypeMarkdown || file.Type == FileTypeTemplate {
-			//TODO: Template
 
+			tmpl := template.New(file.Path)
+			tmpl, err = tmpl.Parse(string(file.Content))
+			if err != nil {
+				return err
+			}
+
+			var output bytes.Buffer
+
+			err = tmpl.Execute(&output, file.Meta)
+			if err != nil {
+				return err
+			}
+			file.Content = output.Bytes()
 		}
 	}
 
