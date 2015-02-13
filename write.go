@@ -26,12 +26,15 @@ func WriteFile(file *File, path string) (err error) {
 	os.MkdirAll(dirPath, DirPerm)
 
 	fullPath := filepath.Join(path, "/")
-	if file.Type == FileTypeTemplate || file.Type == FileTypeMarkdown {
+	if file.Type == FileTypeMarkdown {
 		fullPath = filepath.Join(fullPath, filepath.Dir(file.Path), "/", strings.Replace(filepath.Base(file.Path), file.Ext, ".html", 1))
 	} else {
 		fullPath = filepath.Join(fullPath, file.Path)
 	}
-	err = ioutil.WriteFile(fullPath, file.Content, file.Info.Mode())
+
+	if file.Type != FileTypeTemplate {
+		err = ioutil.WriteFile(fullPath, file.Content, file.Info.Mode())
+	}
 
 	return
 }

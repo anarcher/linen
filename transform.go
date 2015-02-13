@@ -13,7 +13,9 @@ func TransformFiles(files Files) (err error) {
 			file.Content = blackfriday.MarkdownBasic(file.Content)
 		}
 
-		if file.Type == FileTypeMarkdown || file.Type == FileTypeTemplate {
+		if file.Type == FileTypeMarkdown ||
+			file.Type == FileTypeTemplate ||
+			file.Type == FileTypeHTML {
 
 			tmpl := template.New(file.Path)
 			tmpl, err = tmpl.Parse(string(file.Content))

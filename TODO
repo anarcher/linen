@@ -1,0 +1,4 @@
+- .html files just parse with template.
+- .tmpl files use for other files's template.
+- .md files parse with markdown and then template.
+- other files just copy.

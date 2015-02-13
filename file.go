@@ -8,6 +8,7 @@ import (
 const (
 	FileTypeMarkdown = iota
 	FileTypeTemplate
+	FileTypeHTML
 	FileTypeJSON
 	FileTypePlain
 )
@@ -38,6 +39,8 @@ func NewFile(path string, info os.FileInfo) *File {
 		fileType = FileTypeMarkdown
 	case ".tmpl":
 		fileType = FileTypeTemplate
+	case ".html":
+		fileType = FileTypeHTML
 	default:
 		fileType = FileTypePlain
 	}
