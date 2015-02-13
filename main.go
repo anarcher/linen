@@ -28,6 +28,9 @@ func main() {
 		log.Println(err)
 	}
 
-	//WriteFiles(files)
+	err = WriteFiles(files, *targetPath)
+	if err != nil {
+		log.Println(err)
+	}
 
 }

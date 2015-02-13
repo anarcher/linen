@@ -10,7 +10,7 @@ func TestWriteFiles(t *testing.T) {
 	var err error
 
 	srcPath := "./examples/basic/"
-	destPath := "/tmp/basic/"
+	destPath := "/tmp/linen-test01/"
 
 	if err = os.RemoveAll(destPath); err != nil {
 		t.Error(err)

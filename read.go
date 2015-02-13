@@ -67,9 +67,8 @@ func ReadMetaAndBody(content []byte) (meta map[string]interface{}, body []byte, 
 		body = []byte(cs[1])
 		header := []byte(cs[0])
 		if len(header) > 0 {
-			var meta map[string]interface{}
 			if err = json.Unmarshal(header, &meta); err != nil {
-				return nil, body, err
+				return
 			}
 		}
 	} else {
