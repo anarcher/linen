@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,11 +35,11 @@ func ReadFileContent(file *File) (err error) {
 		if err != nil {
 			return err
 		}
-		header, body, _err := ReadHeaderAndBody(c)
+		header, body, _err := ReadMetaAndBody(c)
 		if _err != nil {
 			return _err
 		}
-		file.Meta[FileHeaderRaw] = header
+		file.Meta = header
 		file.Content = body
 
 	} else {
@@ -53,7 +54,7 @@ func ReadFileContent(file *File) (err error) {
 	return nil
 }
 
-func ReadHeaderAndBody(content []byte) (header, body []byte, err error) {
+func ReadMetaAndBody(content []byte) (meta map[string]interface{}, body []byte, err error) {
 
 	c := string(content)
 	if len(c) <= 0 {
@@ -63,8 +64,14 @@ func ReadHeaderAndBody(content []byte) (header, body []byte, err error) {
 	cs := strings.SplitN(c, "\n---\n", 2)
 
 	if len(cs) == 2 {
-		header = []byte(cs[0])
 		body = []byte(cs[1])
+		header := []byte(cs[0])
+		if len(header) > 0 {
+			var meta map[string]interface{}
+			if err = json.Unmarshal(header, &meta); err != nil {
+				return nil, body, err
+			}
+		}
 	} else {
 		body = content
 	}
