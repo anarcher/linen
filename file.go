@@ -13,10 +13,6 @@ const (
 	FileTypePlain
 )
 
-const (
-	FileHeaderRaw = "_header_"
-)
-
 type FileMeta map[string]interface{}
 
 type File struct {

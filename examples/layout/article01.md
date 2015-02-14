@@ -1,7 +1,7 @@
 {
     "title" : "Article 01",
-    "template_name" : "content", //Default name is content
-    "template_file" : "./index.tmpl",
+    "template_name" : "content", 
+    "template_file" : "./index.tmpl"
 }
 
 ---

@@ -20,7 +20,10 @@ func ReadFiles(path string) (files Files, err error) {
 		}
 
 		file := NewFile(path, info)
-		ReadFileContent(file)
+		err = ReadFile(file)
+		if err != nil {
+			return err
+		}
 		files = append(files, file)
 		return nil
 	})
@@ -28,7 +31,7 @@ func ReadFiles(path string) (files Files, err error) {
 	return
 }
 
-func ReadFileContent(file *File) (err error) {
+func ReadFile(file *File) (err error) {
 	if file.Type == FileTypeMarkdown {
 		var c []byte
 		c, err = ioutil.ReadFile(file.Path)
