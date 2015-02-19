@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -70,7 +70,7 @@ func ReadMetaAndBody(content []byte) (meta map[string]interface{}, body []byte, 
 		body = []byte(cs[1])
 		header := []byte(cs[0])
 		if len(header) > 0 {
-			if err = json.Unmarshal(header, &meta); err != nil {
+			if err = yaml.Unmarshal(header, &meta); err != nil {
 				return
 			}
 		}

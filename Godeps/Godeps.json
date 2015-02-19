@@ -24,6 +24,10 @@
 		{
 			"ImportPath": "github.com/shurcooL/sanitized_anchor_name",
 			"Rev": "9a8b7d4e8f347bfa230879db9d7d4e4d9e19f962"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a1c4bcb6c278a41992e2f4f0f29a44b4146daa5c"
 		}
 	]
 }
