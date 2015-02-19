@@ -1,7 +1,5 @@
-{
-    "post" : true,
-    "title" : "About linen"
-}
+post: true,
+title: "About linen"
 ---
 
 <html>

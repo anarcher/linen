@@ -1,6 +1,4 @@
-{
-    "post" : true
-}
+post : true
 ---
 
 # Test

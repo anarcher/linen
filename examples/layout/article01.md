@@ -1,9 +1,6 @@
-{
-    "title" : "Article 01",
-    "template_name" : "content", 
-    "template_file" : "./index.tmpl"
-}
-
+title: "Article 01"
+template_name: "content"
+template_file: "./index.tmpl"
 ---
 
 # What is article?
