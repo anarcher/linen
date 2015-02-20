@@ -32,7 +32,7 @@ func WriteFile(file *File, path string) (err error) {
 		fullPath = filepath.Join(fullPath, file.Path)
 	}
 
-	if file.Type != FileTypeTemplate {
+	if file.IsWrite() {
 		err = ioutil.WriteFile(fullPath, file.Content, file.Info.Mode())
 	}
 

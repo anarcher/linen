@@ -20,6 +20,10 @@ func ReadFiles(path string) (files Files, err error) {
 		}
 
 		file := NewFile(path, info)
+		if file == nil {
+			return nil
+		}
+
 		err = ReadFile(file)
 		if err != nil {
 			return err
@@ -32,12 +36,18 @@ func ReadFiles(path string) (files Files, err error) {
 }
 
 func ReadFile(file *File) (err error) {
+	if file.IsReadContent() == false {
+		return
+	}
+
+	var c []byte
+	c, err = ioutil.ReadFile(file.Path)
+	if err != nil {
+		return err
+	}
+
 	if file.Type == FileTypeMarkdown {
-		var c []byte
-		c, err = ioutil.ReadFile(file.Path)
-		if err != nil {
-			return err
-		}
+
 		header, body, _err := ReadMetaAndBody(c)
 		if _err != nil {
 			return _err
@@ -45,12 +55,17 @@ func ReadFile(file *File) (err error) {
 		file.Meta = header
 		file.Content = body
 
-	} else {
-		var c []byte
-		c, err = ioutil.ReadFile(file.Path)
-		if err != nil {
-			return err
+	} else if file.Type == FileTypeYAMLConf {
+
+		var meta map[string]interface{}
+		if err = yaml.Unmarshal(c, &meta); err != nil {
+			return
 		}
+
+		file.Meta = meta
+
+	} else {
+
 		file.Content = c
 	}
 

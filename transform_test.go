@@ -78,5 +78,16 @@ func TestFileTemplate(t *testing.T) {
 	}
 
 	t.Logf("%v", tmpl)
+}
+
+func TestTransformMeta(t *testing.T) {
+	path := "./examples/basic"
+	files, err := ReadFiles(path)
+	if err != nil {
+		t.Error(err)
+	}
+
+	file := files[1]
+	transformFileMeta(file, files)
 
 }

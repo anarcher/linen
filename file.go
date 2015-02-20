@@ -7,9 +7,9 @@ import (
 
 const (
 	FileTypeMarkdown = iota
+	FileTypeYAMLConf
 	FileTypeTemplate
 	FileTypeHTML
-	FileTypeJSON
 	FileTypePlain
 )
 
@@ -40,6 +40,25 @@ func NewFile(path string, info os.FileInfo) *File {
 	default:
 		fileType = FileTypePlain
 	}
+
+	if base := filepath.Base(path); base == "_.yaml" {
+		fileType = FileTypeYAMLConf
+	}
+
 	file.Type = fileType
 	return file
+}
+
+func (f *File) IsWrite() bool {
+	if f.Type == FileTypeYAMLConf || f.Type == FileTypeTemplate {
+		return false
+	}
+	return true
+}
+
+func (f *File) IsReadContent() bool {
+	if f.Type == FileTypeTemplate {
+		return false
+	}
+	return true
 }
