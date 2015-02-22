@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ahmetalpbalkan/go-linq"
 	//log "github.com/Sirupsen/logrus"
 	//"regexp"
 	"strings"
@@ -35,4 +36,11 @@ func parseExprs(args []string) ([]expr, error) {
 	}
 
 	return exprs, nil
+}
+
+func (e expr) WhereFunc(files Files) func(linq.T) (bool, error) {
+	whereFunc := func(linq.T) (bool, error) {
+		return false, nil
+	}
+	return whereFunc
 }

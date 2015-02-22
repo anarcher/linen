@@ -37,18 +37,14 @@ func (fs Files) Filter(queryOrT interface{}, args ...string) linq.Query {
 
 	exprs, err := parseExprs(args)
 	if err != nil {
-		return nil
+		panic(err)
 	}
 
 	for _, expr := range exprs {
-		err = expr.Match(fs)
-		if err != nil {
-			return nil
-		}
-
+		whereFunc := expr.WhereFunc(fs)
+		query = query.Where(whereFunc)
 	}
 
-	//parseExprs(args)
 	return query
 }
 
