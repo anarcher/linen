@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ahmetalpbalkan/go-linq"
 	"os"
 	"path/filepath"
 )
@@ -25,6 +26,39 @@ type File struct {
 }
 
 type Files []*File
+
+func (fs Files) Filter(queryOrT interface{}, args ...string) linq.Query {
+	var query linq.Query
+	if _, ok := queryOrT.(linq.Query); ok {
+		query = queryOrT.(linq.Query)
+	} else {
+		query = linq.From(fs)
+	}
+
+	exprs, err := parseExprs(args)
+	if err != nil {
+		return nil
+	}
+
+	for _, expr := range exprs {
+		err = expr.Match(fs)
+		if err != nil {
+			return nil
+		}
+
+	}
+
+	//parseExprs(args)
+	return query
+}
+
+func (fs Files) Results(query linq.Query) []linq.T {
+	results, err := query.Results()
+	if err != nil {
+		panic(err)
+	}
+	return results
+}
 
 func NewFile(path string, info os.FileInfo) *File {
 	ext := filepath.Ext(path)

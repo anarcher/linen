@@ -20,9 +20,9 @@ func TestLINGInTemplate(t *testing.T) {
 
 	students := []*Student{clara, tim}
 
-	Filter := func(queryOrT interface{}) linq.Query {
+	Filter := func(queryOrT interface{}, age int) linq.Query {
 		whereFunc := func(s linq.T) (bool, error) {
-			return s.(*Student).age >= 18, nil
+			return s.(*Student).age >= age, nil
 		}
 
 		var query linq.Query
@@ -65,7 +65,7 @@ func TestLINGInTemplate(t *testing.T) {
 	tmpl := template.New("test")
 	tmpl = tmpl.Funcs(funcMap)
 	tmpl, err = tmpl.Parse(`
-	{{ $results :=  . | Filter | Results }}
+	{{ $results :=  Filter . 18 | Results }}
 	Results:
 	{{ range $index,$ele := $results }}
 		{{ $index }} - {{ $ele.Name }} 

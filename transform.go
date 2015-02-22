@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	//	"github.com/ahmetalpbalkan/go-linq"
 )
 
 var (
@@ -50,7 +49,12 @@ func TransformFile(file *File, files Files) (err error) {
 
 		var output bytes.Buffer
 
-		err = tmpl.Execute(&output, file.Meta)
+		type TContext struct {
+			File  *File
+			Files Files
+		}
+
+		err = tmpl.Execute(&output, TContext{file, files})
 		if err != nil {
 			return err
 		}
