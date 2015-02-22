@@ -41,10 +41,15 @@ func (fs Files) Filter(queryOrT interface{}, args ...string) linq.Query {
 	}
 
 	for _, expr := range exprs {
-		whereFunc := expr.WhereFunc(fs)
+		whereFunc := expr.WhereFunc()
 		query = query.Where(whereFunc)
 	}
 
+	return query
+}
+
+func (fs Files) Sort(query linq.Query) linq.Query {
+	//TODO:
 	return query
 }
 

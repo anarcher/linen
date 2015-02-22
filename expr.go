@@ -3,16 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/ahmetalpbalkan/go-linq"
+	"reflect"
 	//log "github.com/Sirupsen/logrus"
 	//"regexp"
 	"strings"
 )
 
-var OPERATORS = []string{"==", "!=", "in"}
+var OPERATORS = []string{"==", "!="}
 
 type expr struct {
 	key      string
-	operator int
+	operator string
 	value    string
 }
 
@@ -21,14 +22,18 @@ func parseExprs(args []string) ([]expr, error) {
 
 	for _, arg := range args {
 		found := false
-		for i, op := range OPERATORS {
+		for _, op := range OPERATORS {
 			//split with the op
 			parts := strings.SplitN(arg, op, 2)
+			fmt.Println("parts:", parts)
 			if len(parts) != 2 {
 				return nil, fmt.Errorf("Value %s is not valid.", arg)
 			}
-			exprs = append(exprs, expr{key: parts[0], operator: i, value: parts[1]})
+			exprs = append(exprs, expr{key: parts[0], operator: op, value: parts[1]})
 			found = true
+			if found {
+				break
+			}
 		}
 		if !found {
 			return nil, fmt.Errorf("One of operator ==,!= is expected")
@@ -38,8 +43,24 @@ func parseExprs(args []string) ([]expr, error) {
 	return exprs, nil
 }
 
-func (e expr) WhereFunc(files Files) func(linq.T) (bool, error) {
-	whereFunc := func(linq.T) (bool, error) {
+func (e expr) WhereFunc() func(linq.T) (bool, error) {
+
+	whereFunc := func(t linq.T) (bool, error) {
+		file := *(t.(*File))
+		keyValue := reflect.ValueOf(file).FieldByName(e.key)
+
+		//TODO: This converting check is not good. I will be digging about how do golang/reflect works.
+		switch e.operator {
+		case "==":
+			if keyValue.String() == e.value {
+				return true, nil
+			}
+		case "!=":
+			if keyValue.String() != e.value {
+				return true, nil
+			}
+		}
+
 		return false, nil
 	}
 	return whereFunc
