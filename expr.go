@@ -25,7 +25,6 @@ func parseExprs(args []string) ([]expr, error) {
 		for _, op := range OPERATORS {
 			//split with the op
 			parts := strings.SplitN(arg, op, 2)
-			fmt.Println("parts:", parts)
 			if len(parts) != 2 {
 				return nil, fmt.Errorf("Value %s is not valid.", arg)
 			}

@@ -22,14 +22,14 @@ func WriteFiles(files Files, path string) (err error) {
 }
 
 func WriteFile(file *File, path string) (err error) {
-	dirPath := path + "/" + filepath.Dir(file.Path)
+	dirPath := path + "/" + file.Dir
 	os.MkdirAll(dirPath, DirPerm)
 
 	fullPath := filepath.Join(path, "/")
 	if file.Type == FileTypeMarkdown {
-		fullPath = filepath.Join(fullPath, filepath.Dir(file.Path), "/", strings.Replace(filepath.Base(file.Path), file.Ext, ".html", 1))
+		fullPath = filepath.Join(fullPath, file.Dir, "/", strings.Replace(file.Base, file.Ext, ".html", 1))
 	} else {
-		fullPath = filepath.Join(fullPath, file.Path)
+		fullPath = filepath.Join(fullPath, file.Path())
 	}
 
 	if file.IsWrite() {

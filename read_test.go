@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/kr/pretty"
-	"path/filepath"
 	"testing"
 )
 
@@ -34,7 +33,7 @@ func TestReadYAMLConf(t *testing.T) {
 	}
 
 	for _, f := range files {
-		if filepath.Base(f.Path) == "_.yaml" {
+		if f.Base == "_.yaml" {
 			if len(f.Meta) <= 0 {
 				t.Errorf("%s could not read", f.Path)
 			}

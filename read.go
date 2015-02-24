@@ -41,7 +41,7 @@ func ReadFile(file *File) (err error) {
 	}
 
 	var c []byte
-	c, err = ioutil.ReadFile(file.Path)
+	c, err = ioutil.ReadFile(file.Path())
 	if err != nil {
 		return err
 	}

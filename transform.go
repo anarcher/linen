@@ -72,14 +72,14 @@ func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
 
 	templateFile, ok := tf.(string)
 	if !ok {
-		err = errors.New(file.Path + ": template_file should be string type.")
+		err = errors.New(file.Path() + ": template_file should be string type.")
 		return
 	}
 
 	if filepath.IsAbs(templateFile) == false {
 		fileDirPath := ""
 		if strings.HasPrefix(templateFile, ".") {
-			fileDirPath = filepath.Dir(file.Path)
+			fileDirPath = file.Dir
 		}
 		templateFile, err = filepath.Abs(filepath.Join(fileDirPath, templateFile))
 		if err != nil {
@@ -96,7 +96,7 @@ func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
 	tn, nameExists := file.Meta["template_name"]
 	templateName, ok := tn.(string)
 	if !ok {
-		err = errors.New(file.Path + ": template_name should be string.")
+		err = errors.New(file.Path() + ": template_name should be string.")
 		return
 	}
 
@@ -105,7 +105,7 @@ func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
 	}
 	err = errors.New(content)
 
-	fileTmpl := template.New(file.Path)
+	fileTmpl := template.New(file.Path())
 	fileTmpl, err = fileTmpl.Parse(content)
 	tmpl = template.Must(template.ParseFiles(templateFile))
 	tmpl = template.Must(tmpl.Parse(content))
@@ -114,7 +114,7 @@ func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
 }
 
 func transformTemplate(file *File) (tmpl *template.Template, err error) {
-	tmpl = template.New(file.Path)
+	tmpl = template.New(file.Path())
 	tmpl, err = tmpl.Parse(string(file.Content))
 	return
 }
@@ -122,7 +122,7 @@ func transformTemplate(file *File) (tmpl *template.Template, err error) {
 func transformFileMeta(file *File, files Files) {
 	//TODO: Need performance check.
 	//TODO: BaseDir in Files?
-	fileDir := filepath.Dir(file.Path)
+	fileDir := filepath.Dir(file.Path())
 	fileDirs := strings.Split(fileDir, string(filepath.Separator))
 
 	var paths []string
@@ -134,7 +134,7 @@ func transformFileMeta(file *File, files Files) {
 
 	for _, path := range paths {
 		for _, _file := range files {
-			if _file.Path == path {
+			if _file.Path() == path {
 				for key, value := range _file.Meta {
 					if _, existed := file.Meta[key]; existed == false {
 						file.Meta[key] = value

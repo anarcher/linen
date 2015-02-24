@@ -6,7 +6,7 @@ import (
 )
 
 func TestExpr(t *testing.T) {
-	args := []string{"Path==/example"}
+	args := []string{"Dir==/example"}
 	exprs, err := parseExprs(args)
 	if err != nil {
 		t.Error(err)
@@ -14,7 +14,7 @@ func TestExpr(t *testing.T) {
 
 	t.Log(exprs)
 
-	file := &File{Path: "/example", Ext: "", Meta: make(map[string]interface{})}
+	file := &File{Dir: "/example", Ext: "", Meta: make(map[string]interface{})}
 	files := []*File{file}
 	query := linq.From(files)
 
