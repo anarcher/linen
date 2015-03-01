@@ -17,6 +17,11 @@ var (
 
 func TransformFiles(files Files) (err error) {
 	for _, file := range files {
+		if file.Type == FileTypeMarkdown {
+			transformFileMeta(file, files)
+		}
+	}
+	for _, file := range files {
 		err = TransformFile(file, files)
 		if err != nil {
 			return

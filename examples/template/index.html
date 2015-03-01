@@ -1,13 +1,12 @@
-{{ $articles := . | Filter "Dir==examples/template" "Ext==.md" | Sort "Base desc" |  Results }}
-
+<!DOCTYPE html>    
 <html>
-    <head>
-    </head>
+    <head></head>
     <body>
     <div>
-        {{ range $index, $element := $articles }}
-            <div>{{ $element.Meta.title }}</div>
-        {{ end }}
+{{ $articles := . | Filter "Dir==examples/template" | Filter "Meta.article==true" | Sort "Base desc" |  Results }}
+{{ range $index, $element := $articles }}
+        <div>{{ $element.Meta.title }}</div>
+{{ end }}
     </div>
     </body>
 </html>

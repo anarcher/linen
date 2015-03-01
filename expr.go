@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ahmetalpbalkan/go-linq"
 	"reflect"
+	"strconv"
 	//log "github.com/Sirupsen/logrus"
 	//"regexp"
 	"strings"
@@ -50,22 +51,64 @@ func (e expr) WhereFunc() func(linq.T) (bool, error) {
 		file := *(t.(*File))
 		var keyValue reflect.Value
 		if strings.HasPrefix(e.key, "Meta.") {
-			//TODO: Need more ... It doesn't works!
 			key := strings.Replace(e.key, "Meta.", "", 1)
-			keyValue = reflect.ValueOf(file.Meta).MapIndex(reflect.ValueOf(key))
+			if val, ok := file.Meta[key]; ok == true {
+				keyValue = reflect.ValueOf(val)
+			} else {
+				return false, nil
+			}
+
 		} else {
 			keyValue = reflect.ValueOf(file).FieldByName(e.key)
 		}
 
-		//TODO: This converting check is not good. I will be digging about how do golang/reflect works.
 		switch e.operator {
 		case "==":
-			if keyValue.String() == e.value {
-				return true, nil
+			switch keyValue.Kind() {
+			case reflect.Int:
+				eVal, err := strconv.Atoi(e.value)
+				if err != nil {
+					return false, err
+				}
+				if keyValue.Interface().(int) == eVal {
+					return true, nil
+				}
+			case reflect.Bool:
+				eVal, err := strconv.ParseBool(e.value)
+				if err != nil {
+					return false, err
+				}
+				if keyValue.Interface().(bool) == eVal {
+					return true, nil
+				}
+			case reflect.String:
+				if keyValue.Interface().(string) == e.value {
+					return true, nil
+				}
 			}
+
 		case "!=":
-			if keyValue.String() != e.value {
-				return true, nil
+			switch keyValue.Kind() {
+			case reflect.Int:
+				eVal, err := strconv.Atoi(e.value)
+				if err != nil {
+					return false, err
+				}
+				if keyValue.Interface().(int) == eVal {
+					return true, nil
+				}
+			case reflect.Bool:
+				eVal, err := strconv.ParseBool(e.value)
+				if err != nil {
+					return false, err
+				}
+				if keyValue.Interface().(bool) != eVal {
+					return true, nil
+				}
+			case reflect.String:
+				if keyValue.Interface().(string) != e.value {
+					return true, nil
+				}
 			}
 		}
 
