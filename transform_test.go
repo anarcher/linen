@@ -59,7 +59,7 @@ func TestFileTemplate(t *testing.T) {
 	}
 
 	var tmpl *template.Template
-	tmpl, err = transformTemplateMeta(file)
+	tmpl, err = transformTemplateMeta(file, Files{file})
 	if err != nil {
 		t.Error(err)
 	}

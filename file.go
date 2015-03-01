@@ -4,6 +4,7 @@ import (
 	"github.com/ahmetalpbalkan/go-linq"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 )
 
@@ -62,6 +63,19 @@ func (fs Files) Sort(query linq.Query, args ...string) linq.Query {
 	}
 
 	return query
+}
+
+func (fs Files) Group(query linq.Query, key string) map[linq.T][]linq.T {
+	groupByFunc := func(t linq.T) linq.T {
+		file := *(t.(*File))
+		keyValue := reflect.ValueOf(file).FieldByName(key)
+		return keyValue
+	}
+	q, err := query.GroupBy(groupByFunc, groupByFunc)
+	if err != nil {
+		panic(err)
+	}
+	return q
 }
 
 func (fs Files) Results(query linq.Query) []linq.T {

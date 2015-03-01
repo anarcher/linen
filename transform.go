@@ -37,23 +37,15 @@ func TransformFile(file *File, files Files) (err error) {
 
 		if file.Type == FileTypeMarkdown {
 			transformFileMeta(file, files)
-			tmpl, err = transformTemplateMeta(file)
+			tmpl, err = transformTemplateMeta(file, files)
 		} else {
-			tmpl, err = transformTemplate(file)
+			tmpl, err = transformTemplate(file, files)
 		}
 
 		//TODO: More expressive about transformTemplate's works
 		if err != nil || tmpl == nil {
 			return
 		}
-
-		funcMap := template.FuncMap{
-			"Filter":  files.Filter,
-			"Sort":    files.Sort,
-			"Count":   files.Count,
-			"Results": files.Results,
-		}
-		tmpl = tmpl.Funcs(funcMap)
 
 		var output bytes.Buffer
 
@@ -71,7 +63,7 @@ func TransformFile(file *File, files Files) (err error) {
 	return
 }
 
-func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
+func transformTemplateMeta(file *File, files Files) (tmpl *template.Template, err error) {
 
 	tf, exists := file.Meta["template_file"]
 	if exists == false {
@@ -114,6 +106,7 @@ func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
 	err = errors.New(content)
 
 	fileTmpl := template.New(file.Path())
+	fileTmpl = templateFuncMap(files, fileTmpl)
 	fileTmpl, err = fileTmpl.Parse(content)
 	tmpl = template.Must(template.ParseFiles(templateFile))
 	tmpl = template.Must(tmpl.Parse(content))
@@ -121,8 +114,9 @@ func transformTemplateMeta(file *File) (tmpl *template.Template, err error) {
 	return
 }
 
-func transformTemplate(file *File) (tmpl *template.Template, err error) {
+func transformTemplate(file *File, files Files) (tmpl *template.Template, err error) {
 	tmpl = template.New(file.Path())
+	tmpl = templateFuncMap(files, tmpl)
 	tmpl, err = tmpl.Parse(string(file.Content))
 	return
 }
@@ -151,4 +145,18 @@ func transformFileMeta(file *File, files Files) {
 			}
 		}
 	}
+}
+
+func templateFuncMap(files Files, tmpl *template.Template) *template.Template {
+	funcMap := template.FuncMap{
+		"Filter":  files.Filter,
+		"Sort":    files.Sort,
+		"Count":   files.Count,
+		"Group":   files.Group,
+		"Results": files.Results,
+	}
+	tmpl = tmpl.Funcs(funcMap)
+
+	return tmpl
+
 }

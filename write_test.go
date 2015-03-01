@@ -9,7 +9,7 @@ import (
 func TestWriteFiles(t *testing.T) {
 	var err error
 
-	srcPath := "./examples/config/"
+	srcPath := "./examples/template/"
 	destPath := "/tmp/linen-test01/"
 
 	if err = os.RemoveAll(destPath); err != nil {

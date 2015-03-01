@@ -1,0 +1,13 @@
+{{ $articles := Filter . ".Meta.article==true" | Results }}
+
+<html>
+    <head>
+    </head>
+    <body>
+    <div>
+        {{ range $index, $element := $articles }}
+            <div>{{ $element.Meta.Title }}</div>
+        {{ end }}
+    </div>
+    </body>
+</html>
