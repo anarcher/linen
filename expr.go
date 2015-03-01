@@ -48,7 +48,14 @@ func (e expr) WhereFunc() func(linq.T) (bool, error) {
 
 	whereFunc := func(t linq.T) (bool, error) {
 		file := *(t.(*File))
-		keyValue := reflect.ValueOf(file).FieldByName(e.key)
+		var keyValue reflect.Value
+		if strings.HasPrefix(e.key, "Meta.") {
+			//TODO: Need more ... It doesn't works!
+			key := strings.Replace(e.key, "Meta.", "", 1)
+			keyValue = reflect.ValueOf(file.Meta).MapIndex(reflect.ValueOf(key))
+		} else {
+			keyValue = reflect.ValueOf(file).FieldByName(e.key)
+		}
 
 		//TODO: This converting check is not good. I will be digging about how do golang/reflect works.
 		switch e.operator {
