@@ -30,15 +30,20 @@ type File struct {
 
 type Files []*File
 
-func (fs Files) Filter(queryOrT interface{}, args ...string) linq.Query {
+func (fs Files) Filter(args ...interface{}) linq.Query {
 	var query linq.Query
+	queryOrT := args[len(args)-1]
 	if _, ok := queryOrT.(linq.Query); ok {
 		query = queryOrT.(linq.Query)
 	} else {
 		query = linq.From(fs)
 	}
 
-	exprs, err := parseExprs(args)
+	var _args []string
+	for _, a := range args[:len(args)-1] {
+		_args = append(_args, a.(string))
+	}
+	exprs, err := parseExprs(_args)
 	if err != nil {
 		panic(err)
 	}
@@ -51,8 +56,14 @@ func (fs Files) Filter(queryOrT interface{}, args ...string) linq.Query {
 	return query
 }
 
-func (fs Files) Sort(query linq.Query, args ...string) linq.Query {
-	exprs, err := parseExprs(args)
+func (fs Files) Sort(args ...interface{}) linq.Query {
+	query := args[len(args)-1].(linq.Query)
+	var _args []string
+	for _, a := range args[:len(args)-1] {
+		_args = append(_args, a.(string))
+	}
+
+	exprs, err := parseExprs(_args)
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +76,7 @@ func (fs Files) Sort(query linq.Query, args ...string) linq.Query {
 	return query
 }
 
-func (fs Files) Group(query linq.Query, key string) map[linq.T][]linq.T {
+func (fs Files) Group(key string, query linq.Query) map[linq.T][]linq.T {
 	groupByFunc := func(t linq.T) linq.T {
 		file := *(t.(*File))
 		keyValue := reflect.ValueOf(file).FieldByName(key)

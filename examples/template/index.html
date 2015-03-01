@@ -1,4 +1,4 @@
-{{ $articles := Filter . "Meta.article==true" | Results }}
+{{ $articles := . | Filter "Dir==examples/template" "Ext==.md" | Sort "Base desc" |  Results }}
 
 <html>
     <head>
@@ -6,7 +6,7 @@
     <body>
     <div>
         {{ range $index, $element := $articles }}
-            <div>{{ $element.Meta.Title }}</div>
+            <div>{{ $element.Meta.title }}</div>
         {{ end }}
     </div>
     </body>
