@@ -47,6 +47,14 @@ func TransformFile(file *File, files Files) (err error) {
 			return
 		}
 
+		funcMap := template.FuncMap{
+			"Filter":  files.Filter,
+			"Sort":    files.Sort,
+			"Count":   files.Count,
+			"Results": files.Results,
+		}
+		tmpl = tmpl.Funcs(funcMap)
+
 		var output bytes.Buffer
 
 		type TContext struct {

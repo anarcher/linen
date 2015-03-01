@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var OPERATORS = []string{"==", "!="}
+var OPERATORS = []string{"==", "!=", "asc", "desc"}
 
 type expr struct {
 	key      string
@@ -25,11 +25,13 @@ func parseExprs(args []string) ([]expr, error) {
 		for _, op := range OPERATORS {
 			//split with the op
 			parts := strings.SplitN(arg, op, 2)
-			if len(parts) != 2 {
-				return nil, fmt.Errorf("Value %s is not valid.", arg)
+			if len(parts) == 2 {
+				exprs = append(exprs, expr{key: parts[0], operator: op, value: parts[1]})
+				found = true
+			} else if len(parts) == 1 {
+				exprs = append(exprs, expr{key: parts[0], operator: op})
+				found = true
 			}
-			exprs = append(exprs, expr{key: parts[0], operator: op, value: parts[1]})
-			found = true
 			if found {
 				break
 			}
@@ -63,4 +65,23 @@ func (e expr) WhereFunc() func(linq.T) (bool, error) {
 		return false, nil
 	}
 	return whereFunc
+}
+
+func (e expr) OrderByFunc() func(this linq.T, that linq.T) bool {
+	orderByFunc := func(this linq.T, that linq.T) bool {
+		thisF := *(this.(*File))
+		thatF := *(that.(*File))
+		thisVal := reflect.ValueOf(thisF).FieldByName(e.key)
+		thatVal := reflect.ValueOf(thatF).FieldByName(e.key)
+
+		//TODO: It's really not Good.
+		switch e.operator {
+		case "asc":
+			return thisVal.String() > thatVal.String()
+		case "desc":
+			return thatVal.String() < thatVal.String()
+		}
+		return false
+	}
+	return orderByFunc
 }

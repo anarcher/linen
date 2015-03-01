@@ -50,8 +50,17 @@ func (fs Files) Filter(queryOrT interface{}, args ...string) linq.Query {
 	return query
 }
 
-func (fs Files) Sort(query linq.Query) linq.Query {
-	//TODO:
+func (fs Files) Sort(query linq.Query, args ...string) linq.Query {
+	exprs, err := parseExprs(args)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, expr := range exprs {
+		orderByFunc := expr.OrderByFunc()
+		query = query.OrderBy(orderByFunc)
+	}
+
 	return query
 }
 
