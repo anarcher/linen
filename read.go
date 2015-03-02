@@ -5,8 +5,16 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
+	"regexp"
 )
+
+var (
+	headerBodyRE *regexp.Regexp
+)
+
+func init() {
+	headerBodyRE = regexp.MustCompile("(?s)^---\n(.+)---\n(.*)$")
+}
 
 func ReadFiles(path string) (files Files, err error) {
 
@@ -79,11 +87,11 @@ func ReadMetaAndBody(content []byte) (meta map[string]interface{}, body []byte, 
 		return
 	}
 
-	cs := strings.SplitN(c, "\n---\n", 2)
+	headerAndBody := headerBodyRE.FindStringSubmatch(c)
 
-	if len(cs) == 2 {
-		body = []byte(cs[1])
-		header := []byte(cs[0])
+	if len(headerAndBody) == 3 {
+		header := []byte(headerAndBody[1])
+		body = []byte(headerAndBody[2])
 		if len(header) > 0 {
 			if err = yaml.Unmarshal(header, &meta); err != nil {
 				return
