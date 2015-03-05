@@ -48,18 +48,10 @@ func parseExprs(args []string) ([]expr, error) {
 func (e expr) WhereFunc() func(linq.T) (bool, error) {
 
 	whereFunc := func(t linq.T) (bool, error) {
-		file := *(t.(*File))
-		var keyValue reflect.Value
-		if strings.HasPrefix(e.key, "Meta.") {
-			key := strings.Replace(e.key, "Meta.", "", 1)
-			if val, ok := file.Meta[key]; ok == true {
-				keyValue = reflect.ValueOf(val)
-			} else {
-				return false, nil
-			}
-
-		} else {
-			keyValue = reflect.ValueOf(file).FieldByName(e.key)
+		file := t.(*File)
+		keyValue := getFileKeyValue(file, e.key)
+		if keyValue == nil {
+			return false, nil
 		}
 
 		switch e.operator {
@@ -119,19 +111,54 @@ func (e expr) WhereFunc() func(linq.T) (bool, error) {
 
 func (e expr) OrderByFunc() func(this linq.T, that linq.T) bool {
 	orderByFunc := func(this linq.T, that linq.T) bool {
-		thisF := *(this.(*File))
-		thatF := *(that.(*File))
-		thisVal := reflect.ValueOf(thisF).FieldByName(e.key)
-		thatVal := reflect.ValueOf(thatF).FieldByName(e.key)
+		thisF := this.(*File)
+		thatF := that.(*File)
+		thisVal := getFileKeyValue(thisF, e.key)
+		thatVal := getFileKeyValue(thatF, e.key)
 
 		//TODO: It's really not Good.
 		switch e.operator {
 		case "asc":
-			return thisVal.String() > thatVal.String()
+			switch thisVal.Kind() {
+			case reflect.Int:
+				return thisVal.Interface().(int) > thatVal.Interface().(int)
+			case reflect.Bool:
+				if thisVal.Interface().(bool) == true {
+					return true
+				}
+				return false
+			case reflect.String:
+				return thisVal.Interface().(string) > thatVal.Interface().(string)
+			}
 		case "desc":
-			return thatVal.String() < thatVal.String()
+			switch thisVal.Kind() {
+			case reflect.Int:
+				return thisVal.Interface().(int) < thatVal.Interface().(int)
+			case reflect.Bool:
+				if thisVal.Interface().(bool) == false {
+					return true
+				}
+				return false
+			case reflect.String:
+				return thisVal.Interface().(string) < thatVal.Interface().(string)
+			}
 		}
 		return false
 	}
 	return orderByFunc
+}
+
+func getFileKeyValue(file *File, key string) *reflect.Value {
+	var keyValue reflect.Value
+	if strings.HasPrefix(key, "Meta.") {
+		key = strings.Replace(key, "Meta.", "", 1)
+		if val, ok := file.Meta[key]; ok == true {
+			keyValue = reflect.ValueOf(val)
+		} else {
+			return nil
+		}
+	} else {
+		keyValue = reflect.ValueOf(*file).FieldByName(key)
+	}
+	return &keyValue
 }
