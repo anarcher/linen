@@ -3,11 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/ahmetalpbalkan/go-linq"
-	"reflect"
-	"strconv"
-	//log "github.com/Sirupsen/logrus"
-	//"regexp"
 	"strings"
+	//log "github.com/Sirupsen/logrus"
 )
 
 var OPERATORS = []string{"==", "!=", "asc", "desc"}
@@ -28,9 +25,6 @@ func parseExprs(args []string) ([]expr, error) {
 			parts := strings.SplitN(arg, op, 2)
 			if len(parts) == 2 {
 				exprs = append(exprs, expr{key: parts[0], operator: op, value: parts[1]})
-				found = true
-			} else if len(parts) == 1 {
-				exprs = append(exprs, expr{key: parts[0], operator: op})
 				found = true
 			}
 			if found {
@@ -53,54 +47,23 @@ func (e expr) WhereFunc() func(linq.T) (bool, error) {
 		if keyValue == nil {
 			return false, nil
 		}
+		if !keyValue.IsValid() {
+			return false, nil
+		}
+
+		op, err := NewOperator(keyValue.Interface(), e.value)
+		if err != nil {
+			return false, err
+		}
 
 		switch e.operator {
 		case "==":
-			switch keyValue.Kind() {
-			case reflect.Int:
-				eVal, err := strconv.Atoi(e.value)
-				if err != nil {
-					return false, err
-				}
-				if keyValue.Interface().(int) == eVal {
-					return true, nil
-				}
-			case reflect.Bool:
-				eVal, err := strconv.ParseBool(e.value)
-				if err != nil {
-					return false, err
-				}
-				if keyValue.Interface().(bool) == eVal {
-					return true, nil
-				}
-			case reflect.String:
-				if keyValue.Interface().(string) == e.value {
-					return true, nil
-				}
+			if op.Eq() == true {
+				return true, nil
 			}
-
 		case "!=":
-			switch keyValue.Kind() {
-			case reflect.Int:
-				eVal, err := strconv.Atoi(e.value)
-				if err != nil {
-					return false, err
-				}
-				if keyValue.Interface().(int) == eVal {
-					return true, nil
-				}
-			case reflect.Bool:
-				eVal, err := strconv.ParseBool(e.value)
-				if err != nil {
-					return false, err
-				}
-				if keyValue.Interface().(bool) != eVal {
-					return true, nil
-				}
-			case reflect.String:
-				if keyValue.Interface().(string) != e.value {
-					return true, nil
-				}
+			if op.Eq() == false {
+				return true, nil
 			}
 		}
 
@@ -115,50 +78,32 @@ func (e expr) OrderByFunc() func(this linq.T, that linq.T) bool {
 		thatF := that.(*File)
 		thisVal := getFileKeyValue(thisF, e.key)
 		thatVal := getFileKeyValue(thatF, e.key)
+		if !thisVal.IsValid() || !thisVal.IsValid() {
+			return false
+		}
+
+		op, err := NewOperator(thisVal.Interface(), thatVal.Interface())
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+
+		opRes := op.Cmp()
 
 		//TODO: It's really not Good.
 		switch e.operator {
 		case "asc":
-			switch thisVal.Kind() {
-			case reflect.Int:
-				return thisVal.Interface().(int) > thatVal.Interface().(int)
-			case reflect.Bool:
-				if thisVal.Interface().(bool) == true {
-					return true
-				}
-				return false
-			case reflect.String:
-				return thisVal.Interface().(string) > thatVal.Interface().(string)
+			if opRes == -1 {
+				return true
 			}
+			return false
 		case "desc":
-			switch thisVal.Kind() {
-			case reflect.Int:
-				return thisVal.Interface().(int) < thatVal.Interface().(int)
-			case reflect.Bool:
-				if thisVal.Interface().(bool) == false {
-					return true
-				}
-				return false
-			case reflect.String:
-				return thisVal.Interface().(string) < thatVal.Interface().(string)
+			if opRes == 1 {
+				return true
 			}
+			return false
 		}
 		return false
 	}
 	return orderByFunc
-}
-
-func getFileKeyValue(file *File, key string) *reflect.Value {
-	var keyValue reflect.Value
-	if strings.HasPrefix(key, "Meta.") {
-		key = strings.Replace(key, "Meta.", "", 1)
-		if val, ok := file.Meta[key]; ok == true {
-			keyValue = reflect.ValueOf(val)
-		} else {
-			return nil
-		}
-	} else {
-		keyValue = reflect.ValueOf(*file).FieldByName(key)
-	}
-	return &keyValue
 }
