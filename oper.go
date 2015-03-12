@@ -24,6 +24,11 @@ type BoolOp struct {
 	a, b bool
 }
 
+type StringListOp struct {
+	a []string
+	b string
+}
+
 func (op *IntOp) Eq() bool {
 	if op.a == op.b {
 		return true
@@ -72,6 +77,24 @@ func (op *BoolOp) Cmp() int {
 	return -1
 }
 
+func (op *StringListOp) Eq() bool {
+	for _, a := range op.a {
+		if a == op.b {
+			return true
+		}
+	}
+	return false
+}
+
+func (op *StringListOp) Cmp() int {
+	for _, a := range op.a {
+		if a == op.b {
+			return 1
+		}
+	}
+	return 0
+}
+
 func NewOperator(A interface{}, B interface{}) (op Operator, err error) {
 	switch A.(type) {
 	case int:
@@ -95,7 +118,8 @@ func NewOperator(A interface{}, B interface{}) (op Operator, err error) {
 		}
 
 		op = &BoolOp{a: A.(bool), b: b}
-
+	case []string:
+		op = &StringListOp{a: A.([]string), b: B.(string)}
 	default:
 		err = fmt.Errorf("Can't match to supported type. %v %v", A, B)
 	}
