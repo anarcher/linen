@@ -3,7 +3,7 @@
     <head></head>
     <body>
     <div>
-{{ $articles := . | Filter "Dir==examples/template" | Filter "Meta.article==true" | Sort "Base desc" |  Results }}
+{{ $articles := . | Filter "Dir==examples/template" | Filter "Meta.article==true" | Filter "Meta.tags==sample1" | Sort "Base desc" |  Results }}
 {{ range $index, $element := $articles }}
         <div>{{ $element.Meta.title }}</div>
 {{ end }}

@@ -118,8 +118,12 @@ func NewOperator(A interface{}, B interface{}) (op Operator, err error) {
 		}
 
 		op = &BoolOp{a: A.(bool), b: b}
-	case []string:
-		op = &StringListOp{a: A.([]string), b: B.(string)}
+	case []interface{}:
+		var a []string
+		for _, i := range A.([]interface{}) {
+			a = append(a, i.(string))
+		}
+		op = &StringListOp{a: a, b: B.(string)}
 	default:
 		err = fmt.Errorf("Can't match to supported type. %v %v", A, B)
 	}
