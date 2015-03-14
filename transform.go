@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var (
@@ -159,9 +160,22 @@ func templateFuncMap(files Files, tmpl *template.Template) *template.Template {
 		"Count":   files.Count,
 		"Group":   files.Group,
 		"Results": files.Results,
+		"Date":    Date,
 	}
 	tmpl = tmpl.Funcs(funcMap)
 
 	return tmpl
+}
 
+func Date(file File) string {
+	const layout = "2006-01-01"
+	if date, ok := file.Meta["date"]; ok {
+		t, err := time.Parse(layout, date.(string))
+		if err != nil {
+			panic(err)
+		}
+		return t.Format(layout)
+	}
+
+	return file.Info.ModTime().Format(layout)
 }

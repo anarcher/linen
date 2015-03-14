@@ -5,7 +5,7 @@
     <div>
 {{ $articles := . | Filter "Dir==examples/template" | Filter "Meta.article==true" | Filter "Meta.tags==sample1" | Sort "Base desc" |  Results }}
 {{ range $index, $element := $articles }}
-        <div>{{ $element.Meta.title }}</div>
+<div>{{ $element.Meta.title }} ({{ $element | Date }})</div>
 {{ end }}
     </div>
     </body>
