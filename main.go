@@ -49,23 +49,7 @@ func BuildAction(c *cli.Context) {
 	srcPath := c.String("src")
 	targetPath := c.String("target")
 
-	var err error
-	var files Files
-
-	files, err = ReadFiles(srcPath)
-	if err != nil {
-		logger.Error("Read", "err", err)
-	}
-
-	err = TransformFiles(files)
-	if err != nil {
-		logger.Error("Transform", "err", err)
-	}
-
-	err = WriteFiles(files, targetPath)
-	if err != nil {
-		logger.Error("Write", "err", err)
-	}
+	Build(srcPath, targetPath)
 
 	logger.Info("DONE")
 }
