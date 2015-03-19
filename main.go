@@ -19,6 +19,15 @@ var (
 		Value: "./target",
 		Usage: "",
 	}
+	flBuild = cli.BoolFlag{
+		Name:  "build,b",
+		Usage: "",
+	}
+	flAddr = cli.StringFlag{
+		Name:  "addr,a",
+		Value: ":8080",
+		Usage: "preview address",
+	}
 )
 
 func init() {
@@ -40,6 +49,13 @@ func main() {
 			Flags:     []cli.Flag{flSrcPath, flTargetPath},
 			Action:    BuildAction,
 		},
+		{
+			Name:      "preview",
+			ShortName: "p",
+			Usage:     "preview",
+			Flags:     []cli.Flag{flSrcPath, flTargetPath, flBuild, flAddr},
+			Action:    PreviewAction,
+		},
 	}
 
 	app.Run(os.Args)
@@ -52,4 +68,14 @@ func BuildAction(c *cli.Context) {
 	Build(srcPath, targetPath)
 
 	logger.Info("DONE")
+}
+
+func PreviewAction(c *cli.Context) {
+	srcPath := c.String("src")
+	targetPath := c.String("target")
+	build := c.Bool("build")
+	addr := c.String("addr")
+
+	previewServe(addr, srcPath, targetPath, build)
+
 }
