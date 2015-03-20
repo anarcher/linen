@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mgutz/logxi/v1"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -19,6 +21,26 @@ func (p *previewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
+	}
+
+	if path == "/" {
+		path = "/index.html"
+	}
+
+	ext := filepath.Ext(path)
+	if ext == "html" {
+		base := filepath.Base(path)
+		path = fmt.Sprintf("%s%s.%s", p.srcPath, base, ext)
+		if _, err := os.Stat(path); err != nil {
+
+			path = fmt.Sprintf("%s%s.%s", p.srcPath, base, "md")
+
+			if _, err := os.Stat(path); err != nil {
+				p.logger.Warn("NotFound", "path", path)
+				http.NotFound(w, r)
+				return
+			}
+		}
 	}
 
 	p.logger.Debug("path", "path", path)
@@ -88,7 +110,25 @@ func (p *previewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func previewServe(addr, srcPath, targetPath string, build bool) {
-	files, err := Build(srcPath, targetPath)
+	files, err := ReadFiles(srcPath)
+	if err != nil {
+		logger.Error("Read", "err", err)
+		return
+	}
+
+	err = TransformFiles(files)
+	if err != nil {
+		logger.Error("Transform", "err", err)
+		return
+	}
+
+	if build {
+		err = WriteFiles(files, targetPath)
+		if err != nil {
+			logger.Error("Write", "err", err)
+			return
+		}
+	}
 
 	http.Handle("/", &previewHandler{
 		files:      files,
