@@ -31,8 +31,10 @@ var (
 )
 
 func init() {
+	if os.Getenv("LOGXI") == "" {
+		log.ProcessLogxiEnv("*=INF")
+	}
 	logger = log.New("linen")
-	logger.SetLevel(log.LevelInfo)
 }
 
 func main() {
@@ -56,6 +58,10 @@ func main() {
 			Flags:     []cli.Flag{flSrcPath, flTargetPath, flBuild, flAddr},
 			Action:    PreviewAction,
 		},
+	}
+
+	if os.Getenv("LOGXI") == "" {
+		os.Setenv("LOGXI", "*=INF")
 	}
 
 	app.Run(os.Args)

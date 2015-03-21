@@ -26,8 +26,6 @@ func parseExprs(args []string) ([]expr, error) {
 			if len(parts) == 2 {
 				exprs = append(exprs, expr{key: parts[0], operator: op, value: parts[1]})
 				found = true
-			}
-			if found {
 				break
 			}
 		}

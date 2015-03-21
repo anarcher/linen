@@ -23,24 +23,29 @@ func (p *previewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		path = "/" + path
 	}
 
-	if path == "/" {
-		path = "/index.html"
+	if strings.HasSuffix(path, "/") {
+		path = path + "index.html"
+	} else if filepath.Ext(path) == "" {
+		path = path + "/index.html"
 	}
 
 	ext := filepath.Ext(path)
-	if ext == "html" {
-		base := filepath.Base(path)
-		path = fmt.Sprintf("%s%s.%s", p.srcPath, base, ext)
-		if _, err := os.Stat(path); err != nil {
 
-			path = fmt.Sprintf("%s%s.%s", p.srcPath, base, "md")
+	if ext == ".html" {
+		path1 := fmt.Sprintf("%s%s", p.srcPath, path)
+		p.logger.Debug("path", "path", path)
+		if _, err := os.Stat(path1); err != nil {
 
-			if _, err := os.Stat(path); err != nil {
+			path1 = fmt.Sprintf("%s%s%s", p.srcPath, strings.TrimRight(path, ".html"), ".md")
+			p.logger.Debug("path1", "path", path1)
+
+			if _, err := os.Stat(path1); err != nil {
 				p.logger.Warn("NotFound", "path", path)
 				http.NotFound(w, r)
 				return
 			}
 		}
+		path = path1
 	}
 
 	p.logger.Debug("path", "path", path)
@@ -110,6 +115,7 @@ func (p *previewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func previewServe(addr, srcPath, targetPath string, build bool) {
+
 	files, err := ReadFiles(srcPath)
 	if err != nil {
 		logger.Error("Read", "err", err)
@@ -119,23 +125,24 @@ func previewServe(addr, srcPath, targetPath string, build bool) {
 	err = TransformFiles(files)
 	if err != nil {
 		logger.Error("Transform", "err", err)
-		return
 	}
 
 	if build {
 		err = WriteFiles(files, targetPath)
 		if err != nil {
 			logger.Error("Write", "err", err)
-			return
 		}
 	}
-
-	http.Handle("/", &previewHandler{
+	p := &previewHandler{
 		files:      files,
 		srcPath:    srcPath,
 		targetPath: targetPath,
 		build:      build,
-		logger:     log.New("preview")})
+		logger:     log.New("preview")}
+
+	http.Handle("/", p)
+
+	p.logger.Info("serve", "addr", addr, "src", srcPath, "target", targetPath, "build", build)
 
 	err = http.ListenAndServe(addr, nil)
 	if err != nil {

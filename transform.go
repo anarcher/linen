@@ -32,10 +32,6 @@ func TransformFiles(files Files) (err error) {
 }
 
 func TransformFile(file *File, files Files) (err error) {
-	if file.Type == FileTypeMarkdown {
-		file.Content = blackfriday.MarkdownBasic(file.Content)
-	}
-
 	if file.Type == FileTypeMarkdown ||
 		file.Type == FileTypeHTML {
 
@@ -44,12 +40,20 @@ func TransformFile(file *File, files Files) (err error) {
 		if file.Type == FileTypeMarkdown {
 			transformFileMeta(file, files)
 			tmpl, err = transformTemplateMeta(file, files)
+			//TODO: Need more accurate method...
+			if err == nil && tmpl == nil {
+				tmpl, err = transformTemplate(file, files)
+			}
+
 		} else {
 			tmpl, err = transformTemplate(file, files)
 		}
 
 		//TODO: More expressive about transformTemplate's works
 		if err != nil || tmpl == nil {
+			if err != nil {
+				logger.Error("transform", "err", err)
+			}
 			return
 		}
 
@@ -66,6 +70,11 @@ func TransformFile(file *File, files Files) (err error) {
 		}
 		file.Content = output.Bytes()
 	}
+
+	if file.Type == FileTypeMarkdown {
+		file.Content = blackfriday.MarkdownBasic(file.Content)
+	}
+
 	return
 }
 
