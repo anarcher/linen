@@ -5,7 +5,7 @@ title: "About linen"
 
 <html>
     <meta>
-        <title>{{ .file.title }}</title>
+        <title>{{ .File.Meta.title }}</title>
     </meta>
     <body>
     {{ . }}
