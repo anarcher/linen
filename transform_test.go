@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/kr/pretty"
+	//"github.com/kr/pretty"
 	"html/template"
 	"os"
 	"testing"
@@ -19,7 +19,7 @@ func TestTransformFiles(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Logf("%# v", pretty.Formatter(files))
+	//t.Logf("%# v", pretty.Formatter(files))
 
 }
 

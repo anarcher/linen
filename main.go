@@ -4,9 +4,12 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/mgutz/logxi/v1"
 	"os"
+	"path/filepath"
 )
 
 var logger log.Logger
+
+var BasePath string
 
 var (
 	flSrcPath = cli.StringFlag{
@@ -35,6 +38,12 @@ func init() {
 		log.ProcessLogxiEnv("*=INF")
 	}
 	logger = log.New("linen")
+
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	BasePath = dir
 }
 
 func main() {
