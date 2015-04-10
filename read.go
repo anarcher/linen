@@ -54,7 +54,7 @@ func ReadFile(file *File) (err error) {
 		return err
 	}
 
-	if file.Type == FileTypeMarkdown {
+	if file.Type == FileTypeMarkdown || file.Type == FileTypeHTML {
 
 		header, body, _err := ReadMetaAndBody(c)
 		if _err != nil {

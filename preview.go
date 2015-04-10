@@ -64,7 +64,7 @@ func (p *previewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if file == nil {
 		fi, err := os.Stat(path)
 		if err != nil {
-			p.logger.Error("file", "err", err)
+			p.logger.Error("file", "err", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
