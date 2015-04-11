@@ -9,7 +9,11 @@ import (
 
 var logger log.Logger
 
-var BasePath string
+var (
+	BasePath   string
+	SrcPath    string
+	TargetPath string
+)
 
 var (
 	flSrcPath = cli.StringFlag{
@@ -77,20 +81,31 @@ func main() {
 }
 
 func BuildAction(c *cli.Context) {
-	srcPath := c.String("src")
-	targetPath := c.String("target")
+	SrcPath = c.String("src")
+	TargetPath = c.String("target")
 
-	Build(srcPath, targetPath)
+	Build(SrcPath, TargetPath)
 
 	logger.Info("DONE")
 }
 
 func PreviewAction(c *cli.Context) {
-	srcPath := c.String("src")
-	targetPath := c.String("target")
+	var err error
+
+	SrcPath, err = filepath.Abs(c.String("src"))
+	if err != nil {
+		logger.Error("srcPath", "path", SrcPath, "err", err)
+		os.Exit(1)
+	}
+	TargetPath, err = filepath.Abs(c.String("target"))
+	if err != nil {
+		logger.Error("targetPath", "path", TargetPath, "err", err)
+		os.Exit(1)
+	}
+
 	build := c.Bool("build")
 	addr := c.String("addr")
 
-	previewServe(addr, srcPath, targetPath, build)
+	previewServe(addr, build)
 
 }

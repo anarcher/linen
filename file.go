@@ -107,7 +107,10 @@ func (fs Files) Count(query linq.Query) int {
 
 func NewFile(path string, info os.FileInfo) *File {
 
-	dir := filepath.Dir(path)
+	dir := strings.Replace(filepath.Dir(path), SrcPath, "", 1)
+	if dir == "" {
+		dir = "/"
+	}
 	base := filepath.Base(path)
 	ext := filepath.Ext(path)
 
@@ -148,16 +151,16 @@ func (f File) IsReadContent() bool {
 }
 
 func (f File) Path() string {
-	return f.Dir + string(os.PathSeparator) + f.Base
+	return filepath.Join(SrcPath, f.Dir, f.Base)
 }
 
 func (f File) Url() string {
 	var fileName string
 	if f.Ext == ".md" {
-		fileName = f.Dir + strings.Replace(f.Base, f.Ext, ".html", 1)
+		fileName = filepath.Join("/", f.Dir, strings.Replace(f.Base, f.Ext, ".html", 1))
 
 	} else {
-		fileName = f.Path()
+		fileName = filepath.Join("/", f.Dir, f.Base)
 	}
 	return fileName
 }
