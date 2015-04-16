@@ -24,7 +24,7 @@ func parseExprs(args []string) ([]expr, error) {
 			//split with the op
 			parts := strings.SplitN(arg, op, 2)
 			if len(parts) == 2 {
-				exprs = append(exprs, expr{key: parts[0], operator: op, value: parts[1]})
+				exprs = append(exprs, expr{key: strings.TrimSpace(parts[0]), operator: op, value: parts[1]})
 				found = true
 				break
 			}
