@@ -72,15 +72,37 @@ func (e expr) WhereFunc() func(linq.T) (bool, error) {
 
 func (e expr) OrderByFunc() func(this linq.T, that linq.T) bool {
 	orderByFunc := func(this linq.T, that linq.T) bool {
-		thisF := this.(*File)
-		thatF := that.(*File)
-		thisVal := getFileKeyValue(thisF, e.key)
-		thatVal := getFileKeyValue(thatF, e.key)
-		if !thisVal.IsValid() || !thisVal.IsValid() {
+		f1 := this.(*File)
+		f2 := that.(*File)
+
+		if e.key == "Date" {
+			d1, err1 := f1.Date()
+			d2, err2 := f2.Date()
+			if err1 != nil || err2 != nil {
+				return false
+			}
+
+			switch e.operator {
+			case "asc":
+				if d1.Before(d2) {
+					return true
+				}
+			case "desc":
+				if d1.After(d2) {
+					return true
+				}
+			}
+
 			return false
 		}
 
-		op, err := NewOperator(thisVal.Interface(), thatVal.Interface())
+		v1 := getFileKeyValue(f1, e.key)
+		v2 := getFileKeyValue(f2, e.key)
+		if !v1.IsValid() || !v2.IsValid() {
+			return false
+		}
+
+		op, err := NewOperator(v1.Interface(), v2.Interface())
 		if err != nil {
 			fmt.Println(err)
 			return false

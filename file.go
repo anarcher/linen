@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"time"
 )
 
 const (
@@ -163,4 +164,14 @@ func (f File) Url() string {
 		fileName = filepath.Join("/", f.Dir, f.Base)
 	}
 	return fileName
+}
+
+func (f File) Date() (time.Time, error) {
+	const layout = "2006-01-01"
+	if date, ok := f.Meta["date"]; ok {
+		t, err := time.Parse(layout, date.(string))
+		return t, err
+	}
+
+	return f.Info.ModTime(), nil
 }
